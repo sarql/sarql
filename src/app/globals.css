@@ -1,0 +1,360 @@
+@import './fonts.css';
+
+:root {
+  --page-background-color: #FDFCFC;
+  --bg-cream: #F5F3F1;
+  --bg-white: #FFFFFF;
+  --bg-black: #000000;
+  --bg-gray-25: #FDFCFC;
+  --bg-gray-100: #F5F3F1;
+  --bg-gray-200: #EBE8E4;
+  --bg-gray-700: #44403B;
+  --bg-gray-800: #292524;
+
+  --text-black: #000000;
+  --text-gray-400: #A59F97;
+  --text-gray-500: #777169;
+  --text-gray-600: #59544F;
+  --text-gray-700: #44403B;
+  --text-white: #FFFFFF;
+
+  /* Single global unified font across entire website */
+  --font-global: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-inter: var(--font-global);
+  --font-waldenburg: var(--font-global);
+  --font-waldenburg-fh: var(--font-global);
+  --font-geist-mono: var(--font-mono, 'Geist Mono', monospace);
+
+  /* ElevenLabs Exact Typography Scale (Mobile Default) */
+  --tw-font-size-2xs: 0.8125rem;
+  --tw-line-height-2xs: 1.125rem;
+  
+  --tw-font-size-xs: 0.875rem;
+  --tw-line-height-xs: 1.3125rem;
+  --tw-line-height-xs-tight: 1.125rem;
+
+  --tw-font-size-sm: 0.9375rem;
+  --tw-line-height-sm: 1.375rem;
+
+  --tw-font-size-base: 1rem;
+  --tw-line-height-base: 1.5rem;
+
+  --tw-font-size-xl: 1.125rem;
+  --tw-line-height-xl: 1.5rem;
+
+  --tw-font-size-2xl: 1.25rem;
+  --tw-line-height-2xl: 1.625rem;
+
+  --tw-font-size-4xl: 1.625rem;
+  --tw-line-height-4xl: 2rem;
+
+  --tw-font-size-5xl: 1.875rem;
+  --tw-line-height-5xl: 2.25rem;
+
+  --tw-font-size-6xl: 2.25rem;
+  --tw-line-height-6xl: 2.625rem;
+
+  /* ElevenLabs Container & Gutters (Mobile First: 1rem outer padding) */
+  --outer-gutter: 1rem;
+  --inner-gutter: 0.5rem;
+  --container-max: 80rem; /* 1280px unified */
+
+  /* ElevenLabs Section Spacing (Mobile First) */
+  --section-py-none: 0rem;
+  --section-py-xs: 1rem;
+  --section-py-sm: 1.5rem;
+  --section-py-md: 2.5rem;
+  --section-py-lg: 3.5rem;
+  --section-py-xl: 4.5rem;
+
+  --section-px-none: 0rem;
+  --section-px-sm: 0.5rem;
+  --section-px-default: 0rem;
+}
+
+/* Tablet Scale */
+@media (min-width: 40rem) {
+  :root {
+    --outer-gutter: 2.5rem;
+    --inner-gutter: 1rem;
+    --section-py-sm: 2.5rem;
+    --section-py-md: 4rem;
+    --section-py-lg: 5rem;
+    --section-py-xl: 6.5rem;
+    --tw-font-size-4xl: 2rem;
+    --tw-line-height-4xl: 2.25rem;
+    --tw-font-size-5xl: 2.25rem;
+    --tw-line-height-5xl: 2.625rem;
+    --tw-font-size-6xl: 3rem;
+    --tw-line-height-6xl: 3.25rem;
+  }
+}
+
+/* Desktop Scale */
+@media (min-width: 64rem) {
+  :root {
+    --outer-gutter: 2.5rem;
+    --inner-gutter: 1rem;
+    --section-py-lg: 6rem;
+    --section-py-xl: 8rem;
+    --tw-font-size-6xl: 3.75rem;
+    --tw-line-height-6xl: 4rem;
+  }
+}
+
+@media (min-width: 80rem) {
+  :root {
+    --outer-gutter: 4rem;
+    --inner-gutter: 1.25rem;
+  }
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-global);
+}
+
+html {
+  font-family: var(--font-global);
+  background-color: var(--page-background-color);
+  color: #000000;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: var(--font-global);
+  background-color: var(--page-background-color);
+  color: #000000;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* General reset for links - explicit color inheritance, NO underlines */
+a {
+  text-decoration: none !important;
+  color: inherit;
+}
+
+a:hover, a:focus, a:visited {
+  text-decoration: none !important;
+}
+
+button, input, select, textarea {
+  font-family: var(--font-global);
+  text-decoration: none !important;
+}
+
+/* ElevenLabs exact tw-type classes unified with one single font */
+.tw-type-2xs {
+  font-family: var(--font-global);
+  font-weight: 400;
+  font-size: var(--tw-font-size-2xs);
+  line-height: var(--tw-line-height-2xs);
+  letter-spacing: 0;
+}
+
+.tw-type-xs-tight {
+  font-family: var(--font-global);
+  font-weight: 400;
+  font-size: var(--tw-font-size-xs);
+  line-height: var(--tw-line-height-xs-tight);
+  letter-spacing: 0.01em;
+}
+
+.tw-type-sm {
+  font-family: var(--font-global);
+  font-weight: 400;
+  font-size: var(--tw-font-size-sm);
+  line-height: var(--tw-line-height-sm);
+  letter-spacing: 0.01em;
+}
+
+.tw-type-base {
+  font-family: var(--font-global);
+  font-weight: 400;
+  font-size: var(--tw-font-size-base);
+  line-height: var(--tw-line-height-base);
+  letter-spacing: 0.01em;
+}
+
+.tw-type-xl {
+  font-family: var(--font-global);
+  font-weight: 500;
+  font-size: var(--tw-font-size-xl);
+  line-height: var(--tw-line-height-xl);
+  letter-spacing: -0.01em;
+}
+
+.tw-type-2xl {
+  font-family: var(--font-global);
+  font-weight: 500;
+  font-size: var(--tw-font-size-2xl);
+  line-height: var(--tw-line-height-2xl);
+  letter-spacing: -0.01em;
+}
+
+.tw-type-4xl {
+  font-family: var(--font-global);
+  font-weight: 400;
+  font-size: var(--tw-font-size-4xl);
+  line-height: var(--tw-line-height-4xl);
+  letter-spacing: -0.02em;
+}
+
+.tw-type-5xl {
+  font-family: var(--font-global);
+  font-weight: 400;
+  font-size: var(--tw-font-size-5xl);
+  line-height: var(--tw-line-height-5xl);
+  letter-spacing: -0.025em;
+}
+
+.tw-type-6xl {
+  font-family: var(--font-global);
+  font-weight: 400;
+  font-size: var(--tw-font-size-6xl);
+  line-height: var(--tw-line-height-6xl);
+  letter-spacing: -0.03em;
+}
+
+/* ElevenLabs exact container frame & grid borders */
+.tw-container {
+  width: 100%;
+  max-width: 80rem; /* 1280px */
+  margin-right: auto;
+  margin-left: auto;
+  padding-left: var(--outer-gutter);
+  padding-right: var(--outer-gutter);
+  position: relative;
+  box-sizing: border-box;
+}
+
+@media (min-width: 48rem) {
+  .tw-container {
+    border-left: 1px solid rgba(0, 0, 0, 0.05);
+    border-right: 1px solid rgba(0, 0, 0, 0.05);
+  }
+}
+
+/* ElevenLabs Section Separator with corner dots */
+.block-divider {
+  position: relative;
+  width: 100%;
+}
+
+.divider-line {
+  height: 1px;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.marker-dot {
+  position: absolute;
+  z-index: 20;
+  display: flex;
+  width: 1.25rem;
+  height: 1.25rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background-color: var(--page-background-color);
+  top: 0;
+}
+
+.marker-dot-left {
+  left: 0;
+  transform: translate(-50%, -50%);
+}
+
+.marker-dot-right {
+  right: 0;
+  transform: translate(50%, -50%);
+}
+
+.marker-center {
+  border-radius: 9999px;
+  background-color: #000000;
+  width: 2px;
+  height: 2px;
+}
+
+/* ElevenLabs Exact Buttons with explicit, bulletproof text contrast */
+.btn-signup {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  outline: none;
+  height: 2.75rem; /* h-11 */
+  font-size: var(--tw-font-size-base);
+  line-height: var(--tw-line-height-base);
+  padding: 0 1.25rem; /* px-5 */
+  gap: 0.5rem;
+  border-radius: 9999px;
+  background-color: #000000 !important;
+  color: #FFFFFF !important;
+  text-decoration: none !important;
+  font-family: var(--font-global);
+  font-weight: 500;
+  transition: background-color 0.15s ease;
+  box-sizing: border-box;
+}
+
+.btn-signup:hover {
+  background-color: #333333 !important;
+  color: #FFFFFF !important;
+}
+
+.btn-signup:active {
+  transform: scale(0.985);
+}
+
+.btn-sales {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  outline: none;
+  height: 2.75rem;
+  font-size: var(--tw-font-size-base);
+  line-height: var(--tw-line-height-base);
+  padding: 0 1.25rem;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  background-color: #FFFFFF !important;
+  color: #000000 !important;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04), 0 2px 4px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  text-decoration: none !important;
+  font-family: var(--font-global);
+  font-weight: 500;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  box-sizing: border-box;
+}
+
+.btn-sales:hover {
+  background-color: #F8F7F6 !important;
+  border-color: rgba(0, 0, 0, 0.25) !important;
+  color: #000000 !important;
+}
+
+.btn-sales:active {
+  transform: scale(0.985);
+}
+
+/* Mobile full-width helper for buttons */
+@media (max-width: 40rem) {
+  .btn-signup,
+  .btn-sales {
+    width: 100%;
+    height: 3rem;
+  }
+}

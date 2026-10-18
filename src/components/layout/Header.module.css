@@ -1,0 +1,172 @@
+.headerWrapper {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background-color: rgba(253, 252, 252, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  width: 100%;
+}
+
+.headerContainer {
+  display: flex;
+  height: 4rem; /* h-16 (64px) */
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.leftGroup {
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+}
+
+@media (min-width: 80rem) {
+  .leftGroup {
+    gap: 2.25rem;
+  }
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: #000000;
+  text-decoration: none;
+}
+
+.logoMark {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  background-color: #000000;
+  border-radius: 4px;
+}
+
+.nav {
+  display: none;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+@media (min-width: 48rem) {
+  .nav {
+    display: flex;
+  }
+}
+
+.navItem {
+  padding: 0.5rem 0.75rem;
+  border-radius: 1.125rem;
+  color: #000000;
+  transition: background-color 0.15s ease;
+  white-space: nowrap;
+}
+
+.navItem:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.rightGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.contactBtn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  height: 2.5rem;
+  padding: 0 1.125rem;
+  border-radius: 9999px;
+  background-color: #FFFFFF !important;
+  color: #000000 !important;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04), 0 2px 4px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background-color 0.15s ease;
+}
+
+@media (min-width: 40rem) {
+  .contactBtn {
+    display: inline-flex;
+  }
+}
+
+.contactBtn:hover {
+  background-color: #F8F7F6 !important;
+}
+
+.signUpBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.5rem;
+  padding: 0 1.25rem;
+  border-radius: 9999px;
+  background-color: #000000 !important;
+  color: #FFFFFF !important;
+  font-weight: 500;
+  transition: background-color 0.15s ease;
+  white-space: nowrap;
+}
+
+.signUpBtn:hover {
+  background-color: #333333 !important;
+}
+
+.mobileMenuBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.04);
+  color: #000000;
+}
+
+@media (min-width: 48rem) {
+  .mobileMenuBtn {
+    display: none;
+  }
+}
+
+/* Mobile dropdown drawer */
+.mobileDrawer {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background-color: #FDFCFC;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 1rem var(--outer-gutter) 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+}
+
+.drawerItem {
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #000000;
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+
+.logoImg {
+  height: 26px;
+  width: auto;
+  max-width: 120px;
+  object-fit: contain;
+  display: block;
+}
