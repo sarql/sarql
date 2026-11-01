@@ -67,12 +67,6 @@ export default function FloatingContactWidget() {
           aria-label={isOpen ? 'Close contact options' : 'Open contact options'}
           title={isOpen ? 'Close' : 'Quick Contact'}
         >
-          {!isOpen && (
-            <span className={styles.onlineBeacon}>
-              <span className={styles.beaconPulse} />
-            </span>
-          )}
-
           {isOpen ? (
             <X size={20} strokeWidth={2.2} />
           ) : (

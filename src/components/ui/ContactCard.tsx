@@ -10,7 +10,7 @@ import {
   sendBeaconLead,
   getSessionLeadId,
 } from '@/services/crmService';
-import { Rocket, Package, MessageSquareQuote, CheckCircle2, Star, X } from 'lucide-react';
+import { CheckCircle2, Star, X } from 'lucide-react';
 
 interface ContactCardProps {
   onSuccess?: () => void;
@@ -204,7 +204,6 @@ export default function ContactCard({ onSuccess, isPopup = false }: ContactCardP
             className={`${styles.tabBtn} ${activeTab === 'project' ? styles.tabBtnActive : ''}`}
             onClick={() => { setActiveTab('project'); setSubmittedMessage(null); }}
           >
-            <Rocket size={16} strokeWidth={2} />
             <span>Start a Project</span>
           </button>
           <button
@@ -214,7 +213,6 @@ export default function ContactCard({ onSuccess, isPopup = false }: ContactCardP
             className={`${styles.tabBtn} ${activeTab === 'review' ? styles.tabBtnActive : ''}`}
             onClick={() => { setActiveTab('review'); setSubmittedMessage(null); }}
           >
-            <MessageSquareQuote size={16} strokeWidth={2} />
             <span>Share Experience / Review</span>
           </button>
         </div>
@@ -225,9 +223,9 @@ export default function ContactCard({ onSuccess, isPopup = false }: ContactCardP
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          background: '#F0FDF4',
-          color: '#15803D',
-          border: '1px solid #BBF7D0',
+          background: '#F4F4F5',
+          color: '#18181B',
+          border: '1px solid #E4E4E7',
           padding: '0.75rem 1rem',
           borderRadius: '0.75rem',
           marginBottom: '1.5rem',
@@ -237,7 +235,7 @@ export default function ContactCard({ onSuccess, isPopup = false }: ContactCardP
           boxShadow: '0 2px 6px rgba(0, 0, 0, 0.03)',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <CheckCircle2 size={18} color="#16A34A" />
+            <CheckCircle2 size={18} color="#18181B" />
             <span>{submittedMessage}</span>
           </div>
           <button
@@ -247,7 +245,7 @@ export default function ContactCard({ onSuccess, isPopup = false }: ContactCardP
               background: 'transparent',
               border: 'none',
               cursor: 'pointer',
-              color: '#15803D',
+              color: '#71717A',
               fontSize: '1.2rem',
               lineHeight: 1,
               padding: '0 0.25rem',
@@ -281,7 +279,6 @@ export default function ContactCard({ onSuccess, isPopup = false }: ContactCardP
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-                <Package size={16} color="#34D399" />
                 <span style={{ fontSize: '0.875rem' }}>
                   Selected Package: <strong style={{ color: '#FFFFFF', fontWeight: 600 }}>{selectedPlan}</strong>
                 </span>
@@ -370,9 +367,9 @@ export default function ContactCard({ onSuccess, isPopup = false }: ContactCardP
                 <span style={{
                   fontSize: '0.75rem',
                   fontWeight: 600,
-                  backgroundColor: '#ECFDF5',
-                  color: '#059669',
-                  border: '1px solid #A7F3D0',
+                  backgroundColor: '#F4F4F5',
+                  color: '#18181B',
+                  border: '1px solid #E4E4E7',
                   padding: '0.15rem 0.5rem',
                   borderRadius: '9999px',
                 }}>

@@ -9,7 +9,7 @@ import {
   sendBeaconLead,
   getSessionLeadId,
 } from '@/services/crmService';
-import { X, ArrowRight, CheckCircle2, PhoneCall } from 'lucide-react';
+import { X, CheckCircle2 } from 'lucide-react';
 
 export default function EnquiryPopup() {
   const pathname = usePathname();
@@ -182,8 +182,8 @@ export default function EnquiryPopup() {
 
         {submitted ? (
           <div className={styles.successBox}>
-            <CheckCircle2 size={36} color="#16A34A" />
-            <h3 className={styles.successTitle}>Thank You!</h3>
+            <CheckCircle2 size={32} color="#111111" />
+            <h3 className={styles.successTitle}>Thank You</h3>
             <p className={styles.successDesc}>
               We received your details and our team will get in touch shortly.
             </p>
@@ -191,10 +191,6 @@ export default function EnquiryPopup() {
         ) : (
           <>
             <div className={styles.header}>
-              <div className={styles.badge}>
-                <span className={styles.pulseDot} />
-                <span>Quick Consultation</span>
-              </div>
               <h2 className={styles.title}>Start Your Project</h2>
               <p className={styles.subtitle}>
                 Tell us about your project. We’ll connect with you shortly.
@@ -242,8 +238,7 @@ export default function EnquiryPopup() {
                 disabled={isSubmitting}
                 className={styles.submitBtn}
               >
-                <span>{isSubmitting ? 'Sending...' : 'Send Inquiry'}</span>
-                {!isSubmitting && <ArrowRight size={15} strokeWidth={2.2} />}
+                {isSubmitting ? 'Sending...' : 'Send Inquiry'}
               </button>
 
               <a
@@ -252,8 +247,7 @@ export default function EnquiryPopup() {
                 rel="noopener noreferrer"
                 className={styles.waOption}
               >
-                <PhoneCall size={12} />
-                <span>Need instant response? Chat on WhatsApp</span>
+                Prefer WhatsApp? Chat with our team →
               </a>
             </form>
           </>
