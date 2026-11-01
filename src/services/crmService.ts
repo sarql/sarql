@@ -276,9 +276,164 @@ export async function submitInquiry(data: InquiryData): Promise<{ id: string; su
     service: data.scope,
     budget: data.budget || 'TBD',
     source: data.source || 'Website',
+    status: data.status || 'New / Submitted',
+    notes: data.notes || '',
   });
 
   return { id, success: true };
+}
+
+/**
+ * Retrieve or initialize a persistent session lead draft ID
+ */
+export function getSessionLeadId(): string {
+  if (typeof window === 'undefined') return `DRAFT-${Date.now().toString().slice(-6)}`;
+  try {
+    let id = sessionStorage.getItem('sarql_session_lead_id');
+    if (!id) {
+      id = `DRAFT-${Date.now().toString().slice(-6)}`;
+      sessionStorage.setItem('sarql_session_lead_id', id);
+    }
+    return id;
+  } catch {
+    return `DRAFT-${Date.now().toString().slice(-6)}`;
+  }
+}
+
+/**
+ * Partial Lead Capture (Debounced auto-save as user types across forms)
+ */
+export async function capturePartialLead(data: {
+  fullName?: string;
+  phone?: string;
+  email?: string;
+  company?: string;
+  scope?: string;
+  source?: string;
+  budget?: string;
+}): Promise<string | null> {
+  const name = (data.fullName || '').trim();
+  const phone = (data.phone || '').trim();
+  const email = (data.email || '').trim();
+  const rawDigits = phone.replace(/[^0-9]/g, '');
+
+  // Qualification criteria: At least 2 characters for name OR at least 4 digits for phone OR valid email
+  const hasActionableData = name.length >= 2 || rawDigits.length >= 4 || email.includes('@');
+  if (!hasActionableData) return null;
+
+  const id = getSessionLeadId();
+  const date = new Date().toISOString().slice(0, 10);
+  const time = new Date().toLocaleTimeString();
+
+  const safePhone = rawDigits
+    ? `'${rawDigits.length >= 10 ? '+91 ' + rawDigits.slice(-10) : '+91 ' + rawDigits}`
+    : 'N/A';
+
+  // 1. Update or create in local CRM storage
+  if (typeof window !== 'undefined') {
+    try {
+      const existingLeads = JSON.parse(localStorage.getItem(STORAGE_KEYS.LEADS) || '[]');
+      const filtered = existingLeads.filter((l: any) => l.id !== id && l.id !== `LEAD-${id.replace('DRAFT-', '')}`);
+
+      const updatedLead = {
+        id,
+        name: name || 'Incomplete Lead (Typing...)',
+        company: data.company || 'Website Visitor',
+        email: email || 'N/A',
+        phone: rawDigits,
+        service: data.scope || 'Browsing Services',
+        budget: data.budget || 'Pending',
+        status: 'Draft / Incomplete',
+        date,
+        time,
+        notes: `Live draft captured as visitor typed via ${data.source || 'Website Form'}. Pending completion.`,
+      };
+
+      localStorage.setItem(STORAGE_KEYS.LEADS, JSON.stringify([updatedLead, ...filtered]));
+      window.dispatchEvent(new Event('sarql_crm_updated'));
+    } catch (e) {
+      console.error('Error saving partial lead locally:', e);
+    }
+  }
+
+  // 2. Post to Google Sheets
+  sendToGoogleSheets({
+    type: 'INQUIRY',
+    timestamp: `${date} ${time}`,
+    id,
+    name: name || 'Incomplete Lead (Typing...)',
+    phone: safePhone,
+    email: email || 'N/A',
+    company: data.company || 'N/A',
+    service: data.scope || 'Incomplete Inquiry Draft',
+    budget: data.budget || 'TBD',
+    source: data.source ? `${data.source} (Draft Capture)` : 'Website (Draft Capture)',
+    status: 'Draft / Incomplete',
+    notes: 'Auto-captured as visitor typed. Follow-up lead.',
+  });
+
+  return id;
+}
+
+/**
+ * Exit-intent Beacon Dispatch on tab close / unload
+ */
+export function sendBeaconLead(data: {
+  fullName?: string;
+  phone?: string;
+  email?: string;
+  company?: string;
+  scope?: string;
+  source?: string;
+  budget?: string;
+}): void {
+  const name = (data.fullName || '').trim();
+  const phone = (data.phone || '').trim();
+  const email = (data.email || '').trim();
+  const rawDigits = phone.replace(/[^0-9]/g, '');
+
+  if (name.length < 2 && rawDigits.length < 4 && !email.includes('@')) return;
+
+  const url = getGoogleSheetUrl();
+  if (!url) return;
+
+  const id = getSessionLeadId();
+  const date = new Date().toISOString().slice(0, 10);
+  const time = new Date().toLocaleTimeString();
+
+  const safePhone = rawDigits
+    ? `'${rawDigits.length >= 10 ? '+91 ' + rawDigits.slice(-10) : '+91 ' + rawDigits}`
+    : 'N/A';
+
+  const payload = JSON.stringify({
+    type: 'INQUIRY',
+    timestamp: `${date} ${time}`,
+    id,
+    name: name || 'Incomplete Lead (Exited Tab)',
+    phone: safePhone,
+    email: email || 'N/A',
+    company: data.company || 'N/A',
+    service: data.scope || 'Exited before submission',
+    budget: data.budget || 'TBD',
+    source: data.source ? `${data.source} (Tab Exit)` : 'Website (Tab Exit)',
+    status: 'Draft / Abandoned',
+    notes: 'Captured via Exit Intent / Tab Unload beacon.',
+  });
+
+  try {
+    if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
+      navigator.sendBeacon(url, payload);
+    } else {
+      fetch(url, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain' },
+        body: payload,
+      });
+    }
+  } catch (e) {
+    console.error('Failed to send beacon lead:', e);
+  }
 }
 
 /**

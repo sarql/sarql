@@ -563,7 +563,7 @@ function handleInquirySubmission(ss, data) {
   }
 
   var timestamp = data.timestamp || Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyy-MM-dd HH:mm:ss");
-  var id = data.id || "INQ-" + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyMMddHHmmss");
+  var id = String(data.id || ("INQ-" + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyMMddHHmmss"))).trim();
   var name = data.name || data.fullName || "Anonymous";
   var rawDigits = String(data.phone || "").replace(/[^0-9]/g, "");
   var phone = rawDigits ? "'" + (rawDigits.length >= 10 ? "+91 " + rawDigits.slice(-10) : "+91 " + rawDigits) : "N/A";
@@ -575,19 +575,54 @@ function handleInquirySubmission(ss, data) {
   var status = data.status || "New";
   var notes = data.notes || "";
 
-  sheet.appendRow([
-    timestamp,
-    id,
-    name,
-    phone,
-    email,
-    company,
-    service,
-    budget,
-    source,
-    status,
-    notes
-  ]);
+  // Check if an existing row matches this ID or 10-digit Phone to update in-place (prevents duplicate draft rows)
+  var lastRow = sheet.getLastRow();
+  var updated = false;
+  if (lastRow > 1) {
+    var dataRange = sheet.getRange(2, 1, lastRow - 1, 11).getValues();
+    for (var r = dataRange.length - 1; r >= 0; r--) {
+      var rowId = String(dataRange[r][1] || "").trim();
+      var rowPhone = String(dataRange[r][3] || "").replace(/[^0-9]/g, "");
+
+      var isIdMatch = id && rowId && (id.toLowerCase() === rowId.toLowerCase());
+      var isPhoneMatch = rawDigits && rawDigits.length >= 10 && rowPhone && (rowPhone.slice(-10) === rawDigits.slice(-10));
+
+      if (isIdMatch || isPhoneMatch) {
+        var targetRowIndex = r + 2;
+        sheet.getRange(targetRowIndex, 1, 1, 11).setValues([[
+          timestamp,
+          id,
+          name,
+          phone,
+          email,
+          company,
+          service,
+          budget,
+          source,
+          status,
+          notes
+        ]]);
+        updated = true;
+        break;
+      }
+    }
+  }
+
+  if (!updated) {
+    sheet.appendRow([
+      timestamp,
+      id,
+      name,
+      phone,
+      email,
+      company,
+      service,
+      budget,
+      source,
+      status,
+      notes
+    ]);
+  }
 
   try { sheet.autoResizeColumns(1, 11); } catch (e) {}
 }

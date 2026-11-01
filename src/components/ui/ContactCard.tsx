@@ -1,9 +1,15 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import styles from '@/app/contact/Contact.module.css';
-import { submitInquiry, submitFeedback } from '@/services/crmService';
+import {
+  submitInquiry,
+  submitFeedback,
+  capturePartialLead,
+  sendBeaconLead,
+  getSessionLeadId,
+} from '@/services/crmService';
 import { Sparkles, MessageSquareQuote, CheckCircle2, Star, X } from 'lucide-react';
 
 interface ContactCardProps {
@@ -43,6 +49,58 @@ export default function ContactCard({ onSuccess, isPopup = false }: ContactCardP
     }
   }, [searchParams]);
 
+  // Ref tracking latest data for exit-intent / unload capture
+  const latestProjectRef = useRef(projectData);
+  useEffect(() => {
+    latestProjectRef.current = projectData;
+  }, [projectData]);
+
+  // 1. Debounced live partial lead capture as visitor types
+  useEffect(() => {
+    if (!projectData.fullName && !projectData.phone && !projectData.email) return;
+
+    const timer = setTimeout(() => {
+      capturePartialLead({
+        fullName: projectData.fullName,
+        phone: projectData.phone,
+        email: projectData.email,
+        company: projectData.company,
+        scope: projectData.scope,
+        source: isPopup ? 'Website 5s Discovery Popup' : 'Website Contact Page',
+      });
+    }, 1400);
+
+    return () => clearTimeout(timer);
+  }, [projectData, isPopup]);
+
+  // 2. Beacon capture on tab close / exit / page hide
+  useEffect(() => {
+    const handleExit = () => {
+      const data = latestProjectRef.current;
+      if (data.fullName || data.phone || data.email) {
+        sendBeaconLead({
+          fullName: data.fullName,
+          phone: data.phone,
+          email: data.email,
+          company: data.company,
+          scope: data.scope,
+          source: isPopup ? 'Website 5s Discovery Popup' : 'Website Contact Page',
+        });
+      }
+    };
+
+    window.addEventListener('beforeunload', handleExit);
+    const handleVisibility = () => {
+      if (document.visibilityState === 'hidden') handleExit();
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleExit);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, [isPopup]);
+
   // Review Form State
   const [reviewData, setReviewData] = useState({
     name: '',
@@ -57,14 +115,17 @@ export default function ContactCard({ onSuccess, isPopup = false }: ContactCardP
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      // 1. Save to CRM and sync to Google Sheets
+      // 1. Save to CRM and sync to Google Sheets (upgrading draft to active submitted lead)
       await submitInquiry({
+        id: getSessionLeadId(),
         fullName: projectData.fullName,
         phone: projectData.phone,
         email: projectData.email,
         company: projectData.company,
         scope: projectData.scope,
         source: isPopup ? 'Website 5s Discovery Popup' : 'Website Contact Page',
+        status: 'Submitted / Active',
+        notes: 'Lead completed and submitted by client.',
       });
 
       setSubmittedMessage('Message sent successfully! We will get in touch with you shortly.');

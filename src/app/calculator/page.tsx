@@ -1,11 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { ChevronUp, X, CheckCircle2, Pencil, RotateCcw } from 'lucide-react';
 import WhatsAppIcon from '@/components/ui/WhatsAppIcon';
 import styles from './Calculator.module.css';
-import { submitInquiry } from '@/services/crmService';
+import {
+  submitInquiry,
+  capturePartialLead,
+  sendBeaconLead,
+  getSessionLeadId,
+} from '@/services/crmService';
 
 interface ClientInfo {
   fullName: string;
@@ -155,16 +160,19 @@ export default function CalculatorPage() {
     setHasClientSaved(true);
     setIsClientModalOpen(false);
 
-    // Save lead capture immediately into CRM & Google Sheet so abandoned sessions are never lost!
+    // Save lead capture immediately into CRM & Google Sheet (upgrades draft to configuring lead)
     try {
       submitInquiry({
+        id: getSessionLeadId(),
         fullName: clientInfo.fullName.trim(),
         phone: clientInfo.phone.trim(),
         email: clientInfo.email.trim() || 'N/A',
         company: clientInfo.company.trim() || 'N/A',
         scope: 'Custom Package Builder (Started Architecture)',
-        budget: 'Draft in progress',
+        budget: estimatedTotal > 0 ? `₹${estimatedTotal.toLocaleString('en-IN')}` : 'Draft in progress',
         source: 'Package Builder (Lead Capture)',
+        status: 'Active / Configuring',
+        notes: 'Client completed initial architecture modal and started selecting package items.',
       });
     } catch (err) {
       console.error('Error submitting initial builder lead:', err);
@@ -219,6 +227,86 @@ export default function CalculatorPage() {
     Object.values(videoCounts).reduce((a, b) => a + b, 0) +
     (mktItem ? 1 : 0);
 
+  // Ref tracking latest client info & selections for unload beacon
+  const latestCalcRef = useRef({ clientInfo, selectedWeb, graphicCounts, videoCounts, selectedMarketing, estimatedTotal });
+  useEffect(() => {
+    latestCalcRef.current = { clientInfo, selectedWeb, graphicCounts, videoCounts, selectedMarketing, estimatedTotal };
+  }, [clientInfo, selectedWeb, graphicCounts, videoCounts, selectedMarketing, estimatedTotal]);
+
+  // Debounced auto-capture as visitor types their details into the builder modal or updates selections
+  useEffect(() => {
+    if (!clientInfo.fullName.trim() && !clientInfo.phone.trim() && !clientInfo.email.trim()) return;
+
+    const timer = setTimeout(() => {
+      const selectedTitles: string[] = [];
+      if (selectedWeb) {
+        const w = WEBSITES.find((x) => x.id === selectedWeb);
+        if (w) selectedTitles.push(w.name);
+      }
+      Object.entries(graphicCounts).forEach(([k, count]) => {
+        if (count > 0) {
+          const g = GRAPHICS.find((x) => x.id === k);
+          if (g) selectedTitles.push(`${g.name} × ${count}`);
+        }
+      });
+      Object.entries(videoCounts).forEach(([k, count]) => {
+        if (count > 0) {
+          const v = VIDEOS.find((x) => x.id === k);
+          if (v) selectedTitles.push(`${v.name} × ${count}`);
+        }
+      });
+      if (selectedMarketing) {
+        const m = MARKETING.find((x) => x.id === selectedMarketing);
+        if (m) selectedTitles.push(m.name);
+      }
+
+      const scopeDesc = selectedTitles.length > 0
+        ? `Builder Items: ${selectedTitles.join(', ')}`
+        : 'Custom Package Builder (Started Configuration)';
+
+      capturePartialLead({
+        fullName: clientInfo.fullName,
+        phone: clientInfo.phone,
+        email: clientInfo.email,
+        company: clientInfo.company,
+        scope: scopeDesc,
+        budget: estimatedTotal > 0 ? `₹${estimatedTotal.toLocaleString('en-IN')}` : 'TBD',
+        source: 'Package Builder',
+      });
+    }, 1400);
+
+    return () => clearTimeout(timer);
+  }, [clientInfo, selectedWeb, graphicCounts, videoCounts, selectedMarketing, estimatedTotal]);
+
+  // Exit-intent unload beacon for package builder
+  useEffect(() => {
+    const handleExit = () => {
+      const data = latestCalcRef.current;
+      if (data.clientInfo.fullName || data.clientInfo.phone || data.clientInfo.email) {
+        sendBeaconLead({
+          fullName: data.clientInfo.fullName,
+          phone: data.clientInfo.phone,
+          email: data.clientInfo.email,
+          company: data.clientInfo.company,
+          scope: `Builder Session Abandoned (Est Total: ₹${data.estimatedTotal.toLocaleString('en-IN')})`,
+          budget: `₹${data.estimatedTotal.toLocaleString('en-IN')}`,
+          source: 'Package Builder',
+        });
+      }
+    };
+
+    window.addEventListener('beforeunload', handleExit);
+    const handleVis = () => {
+      if (document.visibilityState === 'hidden') handleExit();
+    };
+    document.addEventListener('visibilitychange', handleVis);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleExit);
+      document.removeEventListener('visibilitychange', handleVis);
+    };
+  }, []);
+
   
   const handleCalculatorSubmit = async () => {
     try {
@@ -241,6 +329,7 @@ export default function CalculatorPage() {
       summaryScope.push(`Total: ₹${estimatedTotal.toLocaleString('en-IN')}`);
 
       await submitInquiry({
+        id: getSessionLeadId(),
         fullName: clientInfo.fullName.trim() || 'Client Partner',
         phone: clientInfo.phone.trim() || 'WhatsApp Lead',
         email: clientInfo.email.trim() || 'N/A',
@@ -248,6 +337,8 @@ export default function CalculatorPage() {
         scope: summaryScope.join(' | ') || 'Custom Package Estimate',
         budget: `₹${estimatedTotal.toLocaleString('en-IN')}`,
         source: 'Custom Package Builder (Finalized)',
+        status: 'Submitted / WhatsApp Inquiry',
+        notes: 'Client finalized customized package configuration.',
       });
     } catch (e) {
       console.error('Failed to submit final calculator inquiry:', e);
