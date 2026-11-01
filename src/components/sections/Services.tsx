@@ -1,6 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import { motion } from 'framer-motion';
+import Reveal from '@/components/animations/Reveal';
 
 import {
   Code2,
@@ -53,36 +55,40 @@ export default function Services() {
         </div>
 
         <div className={styles.padding}>
-          <div className={styles.headingWrapper}>
-            <h2 className={`${styles.title} tw-type-5xl`}>
-              Our Core Services
-            </h2>
-            <p className={`${styles.subtitle} tw-type-base`}>
-              Engineered with precision for businesses seeking elite digital execution and sustainable growth.
-            </p>
-          </div>
+          <Reveal>
+            <div className={styles.headingWrapper}>
+              <h2 className={`${styles.title} tw-type-5xl`}>
+                Our Core Services
+              </h2>
+              <p className={`${styles.subtitle} tw-type-base`}>
+                Engineered with precision for businesses seeking elite digital execution and sustainable growth.
+              </p>
+            </div>
+          </Reveal>
 
           <div className={styles.grid}>
-            {services.map((item) => {
+            {services.map((item, idx) => {
               const Icon = item.icon;
               return (
-                <Link key={item.title} href={item.href} className={styles.card} style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <div className={styles.cardTop}>
-                    <div className={styles.iconWrap}>
-                      <Icon size={20} strokeWidth={2} />
+                <Reveal key={item.title} delay={idx * 0.08} duration={0.5}>
+                  <Link href={item.href} className={styles.card} style={{ textDecoration: 'none', color: 'inherit', display: 'flex', flexDirection: 'column', height: '100%' }}>
+                    <div className={styles.cardTop}>
+                      <div className={styles.iconWrap}>
+                        <Icon size={20} strokeWidth={2} />
+                      </div>
+                      <h3 className={`${styles.cardTitle} tw-type-xl`}>
+                        {item.title}
+                      </h3>
+                      <p className={`${styles.cardDesc} tw-type-sm`}>
+                        {item.description}
+                      </p>
                     </div>
-                    <h3 className={`${styles.cardTitle} tw-type-xl`}>
-                      {item.title}
-                    </h3>
-                    <p className={`${styles.cardDesc} tw-type-sm`}>
-                      {item.description}
-                    </p>
-                  </div>
-                  <div className={`${styles.cardBottom} tw-type-2xs`}>
-                    <span>{item.tag}</span>
-                    <span>→</span>
-                  </div>
-                </Link>
+                    <div className={`${styles.cardBottom} tw-type-2xs`}>
+                      <span>{item.tag}</span>
+                      <span>→</span>
+                    </div>
+                  </Link>
+                </Reveal>
               );
             })}
           </div>

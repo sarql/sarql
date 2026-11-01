@@ -1,6 +1,7 @@
 'use client';
 
 import styles from './Founders.module.css';
+import Reveal from '@/components/animations/Reveal';
 
 const founders = [
   {
@@ -29,35 +30,39 @@ export default function Founders() {
         </div>
 
         <div className={styles.padding}>
-          <div className={styles.headingWrapper}>
-            <h2 className={`${styles.title} tw-type-5xl`}>
-              Meet The Founders
-            </h2>
-            <p className={`${styles.subtitle} tw-type-base`}>
-              The minds behind Sarql, dedicated to engineering elite digital ecosystems from Kerala to the world.
-            </p>
-          </div>
+          <Reveal>
+            <div className={styles.headingWrapper}>
+              <h2 className={`${styles.title} tw-type-5xl`}>
+                Meet The Founders
+              </h2>
+              <p className={`${styles.subtitle} tw-type-base`}>
+                The minds behind Sarql, dedicated to engineering elite digital ecosystems from Kerala to the world.
+              </p>
+            </div>
+          </Reveal>
 
           <div className={styles.grid}>
-            {founders.map((f) => (
-              <div key={f.name} className={styles.card}>
-                <div className={styles.header}>
-                  <div className={`${styles.avatar} tw-type-xl`}>
-                    {f.initials}
+            {founders.map((f, idx) => (
+              <Reveal key={f.name} delay={idx * 0.12} duration={0.6}>
+                <div className={styles.card} style={{ height: '100%' }}>
+                  <div className={styles.header}>
+                    <div className={`${styles.avatar} tw-type-xl`}>
+                      {f.initials}
+                    </div>
+                    <div>
+                      <h3 className={`${styles.name} tw-type-xl`}>
+                        {f.name}
+                      </h3>
+                      <p className={`${styles.role} tw-type-sm`}>
+                        {f.role}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className={`${styles.name} tw-type-xl`}>
-                      {f.name}
-                    </h3>
-                    <p className={`${styles.role} tw-type-sm`}>
-                      {f.role}
-                    </p>
-                  </div>
+                  <p className={`${styles.bio} tw-type-base`}>
+                    {f.bio}
+                  </p>
                 </div>
-                <p className={`${styles.bio} tw-type-base`}>
-                  {f.bio}
-                </p>
-              </div>
+              </Reveal>
             ))}
           </div>
         </div>

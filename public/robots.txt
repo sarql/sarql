@@ -1,0 +1,7 @@
+User-Agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+
+Host: https://sarql.com
+Sitemap: https://sarql.com/sitemap.xml

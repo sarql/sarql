@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { ArrowUpRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import Reveal from '@/components/animations/Reveal';
 import styles from './Projects.module.css';
 
 const projects = [
@@ -194,40 +195,42 @@ export default function Projects() {
         </div>
 
         <div className={styles.padding}>
-          <div className={styles.headingWrapper}>
-            <div>
-              <h2 className={`${styles.title} tw-type-5xl`}>
-                Our Live Projects
-              </h2>
-              <p className={`${styles.subtitle} tw-type-base`}>
-                Real production web systems deployed for industry-leading clients, built with high-performance modern architectures.
-              </p>
-            </div>
+          <Reveal>
+            <div className={styles.headingWrapper}>
+              <div>
+                <h2 className={`${styles.title} tw-type-5xl`}>
+                  Our Live Projects
+                </h2>
+                <p className={`${styles.subtitle} tw-type-base`}>
+                  Real production web systems deployed for industry-leading clients, built with high-performance modern architectures.
+                </p>
+              </div>
 
-            <div className={styles.headerActions}>
-              {/* Previous / Next Arrow Controls */}
-              <div className={styles.navControls} aria-label="Carousel Navigation">
-                <button
-                  type="button"
-                  onClick={() => scroll('left')}
-                  disabled={!canScrollLeft}
-                  className={styles.navBtn}
-                  aria-label="Previous project"
-                >
-                  <ChevronLeft size={16} strokeWidth={2.2} />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => scroll('right')}
-                  disabled={!canScrollRight}
-                  className={styles.navBtn}
-                  aria-label="Next project"
-                >
-                  <ChevronRight size={16} strokeWidth={2.2} />
-                </button>
+              <div className={styles.headerActions}>
+                {/* Previous / Next Arrow Controls */}
+                <div className={styles.navControls} aria-label="Carousel Navigation">
+                  <button
+                    type="button"
+                    onClick={() => scroll('left')}
+                    disabled={!canScrollLeft}
+                    className={styles.navBtn}
+                    aria-label="Previous project"
+                  >
+                    <ChevronLeft size={16} strokeWidth={2.2} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => scroll('right')}
+                    disabled={!canScrollRight}
+                    className={styles.navBtn}
+                    aria-label="Next project"
+                  >
+                    <ChevronRight size={16} strokeWidth={2.2} />
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
+          </Reveal>
 
           {/* Horizontal Side-Scrolling Carousel Track */}
           <div className={styles.carouselContainer}>

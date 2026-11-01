@@ -9,6 +9,7 @@ import {
   sendBeaconLead,
   getSessionLeadId,
 } from '@/services/crmService';
+import { motion, AnimatePresence } from 'framer-motion';
 import { X, CheckCircle2 } from 'lucide-react';
 
 export default function EnquiryPopup() {
@@ -160,99 +161,118 @@ export default function EnquiryPopup() {
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div
-      className={styles.overlay}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) handleClose();
-      }}
-    >
-      <div className={styles.modal} role="dialog" aria-modal="true">
-        {/* Minimal Close Button */}
-        <button
-          onClick={handleClose}
-          className={styles.closeBtn}
-          aria-label="Close"
-          title="Close (Esc)"
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          className={styles.overlay}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) handleClose();
+          }}
         >
-          <X size={15} strokeWidth={2.2} />
-        </button>
+          <motion.div
+            className={styles.modal}
+            role="dialog"
+            aria-modal="true"
+            initial={{ opacity: 0, scale: 0.94, y: 16 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 12 }}
+            transition={{ type: 'spring', damping: 28, stiffness: 380 }}
+          >
+            {/* Minimal Close Button */}
+            <button
+              onClick={handleClose}
+              className={styles.closeBtn}
+              aria-label="Close"
+              title="Close (Esc)"
+            >
+              <X size={15} strokeWidth={2.2} />
+            </button>
 
-        {submitted ? (
-          <div className={styles.successBox}>
-            <CheckCircle2 size={32} color="#111111" />
-            <h3 className={styles.successTitle}>Thank You</h3>
-            <p className={styles.successDesc}>
-              We received your details and our team will get in touch shortly.
-            </p>
-          </div>
-        ) : (
-          <>
-            <div className={styles.header}>
-              <h2 className={styles.title}>Start Your Project</h2>
-              <p className={styles.subtitle}>
-                Tell us about your project. We’ll connect with you shortly.
-              </p>
-            </div>
-
-            <form onSubmit={handleSubmit} className={styles.form}>
-              <div className={styles.field}>
-                <label className={styles.label}>Your Name *</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="e.g. Muhammed Ansar"
-                  className={styles.input}
-                />
-              </div>
-
-              <div className={styles.field}>
-                <label className={styles.label}>Phone / WhatsApp *</label>
-                <input
-                  type="tel"
-                  required
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  placeholder="+91 98765 43210"
-                  className={styles.input}
-                />
-              </div>
-
-              <div className={styles.field}>
-                <label className={styles.label}>What do you need?</label>
-                <textarea
-                  rows={2}
-                  value={formData.scope}
-                  onChange={(e) => setFormData({ ...formData, scope: e.target.value })}
-                  placeholder="e.g. Website, Branding, Web App..."
-                  className={styles.textarea}
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className={styles.submitBtn}
+            {submitted ? (
+              <motion.div
+                className={styles.successBox}
+                initial={{ opacity: 0, scale: 0.92 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.25 }}
               >
-                {isSubmitting ? 'Sending...' : 'Send Inquiry'}
-              </button>
+                <CheckCircle2 size={32} color="#111111" />
+                <h3 className={styles.successTitle}>Thank You</h3>
+                <p className={styles.successDesc}>
+                  We received your details and our team will get in touch shortly.
+                </p>
+              </motion.div>
+            ) : (
+              <>
+                <div className={styles.header}>
+                  <h2 className={styles.title}>Start Your Project</h2>
+                  <p className={styles.subtitle}>
+                    Tell us about your project. We’ll connect with you shortly.
+                  </p>
+                </div>
 
-              <a
-                href="https://wa.me/917558811574"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.waOption}
-              >
-                Prefer WhatsApp? Chat with our team →
-              </a>
-            </form>
-          </>
-        )}
-      </div>
-    </div>
+                <form onSubmit={handleSubmit} className={styles.form}>
+                  <div className={styles.field}>
+                    <label className={styles.label}>Your Name *</label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      placeholder="e.g. Muhammed Ansar"
+                      className={styles.input}
+                    />
+                  </div>
+
+                  <div className={styles.field}>
+                    <label className={styles.label}>Phone / WhatsApp *</label>
+                    <input
+                      type="tel"
+                      required
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      placeholder="+91 98765 43210"
+                      className={styles.input}
+                    />
+                  </div>
+
+                  <div className={styles.field}>
+                    <label className={styles.label}>What do you need?</label>
+                    <textarea
+                      rows={2}
+                      value={formData.scope}
+                      onChange={(e) => setFormData({ ...formData, scope: e.target.value })}
+                      placeholder="e.g. Website, Branding, Web App..."
+                      className={styles.textarea}
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className={styles.submitBtn}
+                  >
+                    {isSubmitting ? 'Sending...' : 'Send Inquiry'}
+                  </button>
+
+                  <a
+                    href="https://wa.me/917558811574"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.waOption}
+                  >
+                    Prefer WhatsApp? Chat with our team →
+                  </a>
+                </form>
+              </>
+            )}
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

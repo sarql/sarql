@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Reveal from '@/components/animations/Reveal';
 import styles from './Cta.module.css';
 
 export default function Cta() {
@@ -14,20 +15,22 @@ export default function Cta() {
           <div className="divider-line" />
         </div>
 
-        <div className={styles.stripInner}>
-          <h2 className={`${styles.title} tw-type-4xl`}>
-            Digital Engineering &amp; Platform Growth
-          </h2>
+        <Reveal>
+          <div className={styles.stripInner}>
+            <h2 className={`${styles.title} tw-type-4xl`}>
+              Digital Engineering &amp; Platform Growth
+            </h2>
 
-          <div className={styles.actions}>
-            <Link href="mailto:team.sarql@gmail.com" className="btn-sales">
-              Talk to us
-            </Link>
-            <Link href="/contact/" className="btn-signup">
-              Start a project
-            </Link>
+            <div className={styles.actions}>
+              <Link href="mailto:team.sarql@gmail.com" className="btn-sales">
+                Talk to us
+              </Link>
+              <Link href="/contact/" className="btn-signup">
+                Start a project
+              </Link>
+            </div>
           </div>
-        </div>
+        </Reveal>
       </div>
     </section>
   );

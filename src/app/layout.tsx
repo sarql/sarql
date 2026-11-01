@@ -6,18 +6,145 @@ import EnquiryPopup from '@/components/ui/EnquiryPopup';
 import FloatingContactWidget from '@/components/ui/FloatingContactWidget';
 
 export const metadata: Metadata = {
-  title: 'Sarql — Digital Excellence & Engineering',
+  metadataBase: new URL('https://sarql.com'),
+  title: {
+    default: 'Sarql — Digital Engineering & Visual Identity Agency',
+    template: '%s | Sarql',
+  },
   description:
-    'Sarql engineers clear, functional, and memorable digital experiences. From cinematic visual identity to enterprise web development.',
-  keywords: ['Sarql', 'Web Development', 'Digital Agency', 'UI/UX', 'Digital Marketing'],
+    'Sarql is a premier digital agency in Kerala & global tech partner specializing in high-performance web development, custom UI/UX design, branding, and scalable digital solutions.',
+  keywords: [
+    'Sarql',
+    'Sarql Agency',
+    'Web Development Kerala',
+    'Website Design Kochi',
+    'Digital Agency Kerala',
+    'UI UX Design Agency',
+    'Brand Identity Kerala',
+    'Next.js Developers',
+    'Full Stack Web Development',
+    'Website Packages Kerala',
+    'Custom Software Development',
+    'Vengara Malappuram',
+    'Infopark Kochi',
+  ],
+  authors: [{ name: 'Sarql Engineering Team', url: 'https://sarql.com' }],
+  creator: 'Sarql',
+  publisher: 'Sarql',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  alternates: {
+    canonical: 'https://sarql.com',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_IN',
+    url: 'https://sarql.com',
+    siteName: 'Sarql',
+    title: 'Sarql — Digital Engineering & Visual Identity Agency',
+    description:
+      'Sarql engineers clear, functional, and memorable digital experiences. From cinematic visual identity to enterprise web development.',
+    images: [
+      {
+        url: '/sarql-og.png',
+        width: 1200,
+        height: 630,
+        alt: 'Sarql — Digital Engineering & Visual Identity Agency',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Sarql — Digital Engineering & Visual Identity Agency',
+    description:
+      'Sarql engineers clear, functional, and memorable digital experiences. From cinematic visual identity to enterprise web development.',
+    images: ['/sarql-og.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
   icons: {
     icon: [
       { url: '/sarql-icon.png?v=5', type: 'image/png' },
-      { url: '/favicon.ico?v=5' }
+      { url: '/favicon.ico?v=5' },
     ],
     shortcut: ['/sarql-icon.png?v=5'],
     apple: ['/apple-icon.png?v=5'],
   },
+};
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': ['ProfessionalService', 'Organization'],
+      '@id': 'https://sarql.com/#organization',
+      name: 'Sarql',
+      url: 'https://sarql.com',
+      logo: 'https://sarql.com/sarql.png',
+      image: 'https://sarql.com/sarql-og.png',
+      description:
+        'Premier digital engineering and visual identity agency based in Kerala, India.',
+      telephone: '+917558811574',
+      email: 'team.sarql@gmail.com',
+      priceRange: '₹₹',
+      address: [
+        {
+          '@type': 'PostalAddress',
+          streetAddress: 'Vengara',
+          addressLocality: 'Malappuram',
+          addressRegion: 'Kerala',
+          postalCode: '676304',
+          addressCountry: 'IN',
+        },
+        {
+          '@type': 'PostalAddress',
+          streetAddress: 'Infopark Phase II',
+          addressLocality: 'Kochi',
+          addressRegion: 'Kerala',
+          postalCode: '682042',
+          addressCountry: 'IN',
+        },
+      ],
+      sameAs: [
+        'https://instagram.com/sarql.agency',
+        'https://wa.me/917558811574',
+      ],
+      openingHoursSpecification: {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: [
+          'Monday',
+          'Tuesday',
+          'Wednesday',
+          'Thursday',
+          'Friday',
+          'Saturday',
+        ],
+        opens: '09:00',
+        closes: '19:00',
+      },
+    },
+    {
+      '@type': 'WebSite',
+      '@id': 'https://sarql.com/#website',
+      url: 'https://sarql.com',
+      name: 'Sarql',
+      publisher: {
+        '@id': 'https://sarql.com/#organization',
+      },
+    },
+  ],
 };
 
 export default function RootLayout({
@@ -59,6 +186,10 @@ export default function RootLayout({
           as="font"
           type="font/woff2"
           crossOrigin="anonymous"
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
       <body className="site-frame">

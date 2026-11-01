@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { MessageSquareQuote, X, CheckCircle2, Star } from 'lucide-react';
+import Reveal from '@/components/animations/Reveal';
 import styles from './Testimonials.module.css';
 import {
   getStoredReviews,
@@ -86,28 +87,30 @@ export default function Testimonials() {
 
         <div className={styles.padding}>
           {/* Header Row */}
-          <div className={styles.headingWrapper}>
-            <div className={styles.headingText}>
-              <h2 className={`${styles.title} tw-type-5xl`}>
-                Client Feedback
-              </h2>
-              <p className={`${styles.subtitle} tw-type-base`}>
-                Verified client feedback and partnerships built on engineering excellence and measurable business results.
-              </p>
-            </div>
+          <Reveal>
+            <div className={styles.headingWrapper}>
+              <div className={styles.headingText}>
+                <h2 className={`${styles.title} tw-type-5xl`}>
+                  Client Feedback
+                </h2>
+                <p className={`${styles.subtitle} tw-type-base`}>
+                  Verified client feedback and partnerships built on engineering excellence and measurable business results.
+                </p>
+              </div>
 
-            <div className={styles.headerActions}>
-              <button
-                type="button"
-                onClick={() => setIsModalOpen(true)}
-                className="btn-sales"
-                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem', cursor: 'pointer' }}
-              >
-                <MessageSquareQuote size={16} strokeWidth={2} />
-                <span>Add Feedback</span>
-              </button>
+              <div className={styles.headerActions}>
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(true)}
+                  className="btn-sales"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem', cursor: 'pointer' }}
+                >
+                  <MessageSquareQuote size={16} strokeWidth={2} />
+                  <span>Add Feedback</span>
+                </button>
+              </div>
             </div>
-          </div>
+          </Reveal>
 
           {/* Toast Notification */}
           {toastMessage && (
@@ -147,31 +150,33 @@ export default function Testimonials() {
           ) : (
             <div className={styles.grid}>
               {reviews.map((t, idx) => (
-                <div key={t.id || `${t.name}-${idx}`} className={styles.card}>
-                  <div>
-                    <div className={styles.starsRow}>
-                      {[1, 2, 3, 4, 5].map((s) => (
-                        <span
-                          key={s}
-                          style={{ color: s <= (t.rating || 5) ? '#F59E0B' : '#E5E7EB' }}
-                        >
-                          ★
-                        </span>
-                      ))}
+                <Reveal key={t.id || `${t.name}-${idx}`} delay={idx * 0.08} duration={0.5}>
+                  <div className={styles.card} style={{ height: '100%' }}>
+                    <div>
+                      <div className={styles.starsRow}>
+                        {[1, 2, 3, 4, 5].map((s) => (
+                          <span
+                            key={s}
+                            style={{ color: s <= (t.rating || 5) ? '#F59E0B' : '#E5E7EB' }}
+                          >
+                            ★
+                          </span>
+                        ))}
+                      </div>
+                      <p className={`${styles.quote} tw-type-base`}>
+                        &ldquo;{t.review}&rdquo;
+                      </p>
                     </div>
-                    <p className={`${styles.quote} tw-type-base`}>
-                      &ldquo;{t.review}&rdquo;
-                    </p>
+                    <div className={styles.author}>
+                      <span className={`${styles.authorName} tw-type-sm`}>
+                        {t.name}
+                      </span>
+                      <span className={`${styles.authorRole} tw-type-2xs`}>
+                        {t.roleCompany || 'Client Partner'}
+                      </span>
+                    </div>
                   </div>
-                  <div className={styles.author}>
-                    <span className={`${styles.authorName} tw-type-sm`}>
-                      {t.name}
-                    </span>
-                    <span className={`${styles.authorRole} tw-type-2xs`}>
-                      {t.roleCompany || 'Client Partner'}
-                    </span>
-                  </div>
-                </div>
+                </Reveal>
               ))}
             </div>
           )}
