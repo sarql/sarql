@@ -543,7 +543,7 @@ Branch / Tech Partner: Infopark Phase II, Kochi, Kerala, India – 682042
 
 Phone / WhatsApp: +91 7558811574
 
-Email: hello@sarql.com
+Email: team.sarql@gmail.com
 
 Website: https://sarql.com
 

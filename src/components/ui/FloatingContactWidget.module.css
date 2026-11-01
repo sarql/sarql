@@ -1,0 +1,166 @@
+.widgetContainer {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 140;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+  user-select: none;
+}
+
+@media (max-width: 63.99rem) {
+  .widgetContainer {
+    bottom: 1.25rem;
+    right: 1.25rem;
+  }
+
+  .widgetContainerCalculator {
+    bottom: 5.5rem;
+  }
+}
+
+/* Speed Dial Options Container - Clean Icon-Only Stack */
+.optionsMenu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.625rem;
+  animation: menuEnter 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes menuEnter {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Circular Action Icon Buttons */
+.actionBtn {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  border: none;
+  text-decoration: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.actionBtn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+}
+
+.actionBtn:active {
+  transform: scale(0.94);
+}
+
+.whatsappBtn {
+  background: transparent;
+  box-shadow: none;
+  border-radius: 9999px;
+  padding: 0;
+  filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.22));
+}
+
+.whatsappBtn:hover {
+  background: transparent;
+  transform: scale(1.1);
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.3));
+}
+
+.callBtn {
+  background: #000000;
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.callBtn:hover {
+  background: #18181B;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Main Floating Trigger Button */
+.triggerBtn {
+  width: 3.375rem;
+  height: 3.375rem;
+  border-radius: 9999px;
+  background: #000000;
+  color: #FFFFFF;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.15s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.triggerBtn:hover {
+  transform: scale(1.08);
+  background: #18181B;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.38);
+}
+
+.triggerBtn:active {
+  transform: scale(0.95);
+}
+
+.triggerBtnActive {
+  background: #18181B;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Live Online Status Dot */
+.onlineBeacon {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 9999px;
+  background: #22C55E;
+  box-shadow: 0 0 0 2px #000000;
+}
+
+.beaconPulse {
+  position: absolute;
+  inset: -2px;
+  border-radius: 9999px;
+  background: rgba(34, 197, 94, 0.6);
+  animation: pulseDot 2s infinite ease-out;
+}
+
+@keyframes pulseDot {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+/* Invisible backdrop for tap-outside to close */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 139;
+  background: transparent;
+}

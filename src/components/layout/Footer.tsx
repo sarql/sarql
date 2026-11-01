@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import WhatsAppIcon from '@/components/ui/WhatsAppIcon';
 import styles from './Footer.module.css';
 
 export default function Footer() {
@@ -26,8 +27,14 @@ export default function Footer() {
             <div style={{ marginTop: '1.25rem', fontSize: '0.8125rem', color: 'var(--text-gray-600)', lineHeight: '1.6' }}>
               <div><strong>Location:</strong> Vengara, Malappuram, Kerala – 676304</div>
               <div><strong>Infopark:</strong> Phase II, Kochi, Kerala – 682042</div>
-              <div><strong>WhatsApp:</strong> <a href="https://wa.me/917558811574" target="_blank" rel="noopener noreferrer" style={{ color: '#000', textDecoration: 'underline' }}>+91 7558811574</a></div>
-              <div><strong>Email:</strong> <a href="mailto:hello@sarql.com" style={{ color: '#000', textDecoration: 'underline' }}>hello@sarql.com</a></div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <WhatsAppIcon size={16} color="#25D366" />
+                <strong>WhatsApp:</strong>{' '}
+                <a href="https://wa.me/917558811574" target="_blank" rel="noopener noreferrer" style={{ color: '#000', textDecoration: 'underline' }}>
+                  +91 75588 11574
+                </a>
+              </div>
+              <div><strong>Email:</strong> <a href="mailto:team.sarql@gmail.com" style={{ color: '#000', textDecoration: 'underline' }}>team.sarql@gmail.com</a></div>
             </div>
           </div>
 
@@ -36,11 +43,11 @@ export default function Footer() {
             <h4 className={`${styles.colTitle} tw-type-sm`}>Quick Links</h4>
             <ul className={styles.linkList}>
               <li><Link href="/" className={`${styles.linkItem} tw-type-xs-tight`}>Home</Link></li>
-              <li><Link href="/about" className={`${styles.linkItem} tw-type-xs-tight`}>The Agency</Link></li>
-              <li><Link href="/portfolio" className={`${styles.linkItem} tw-type-xs-tight`}>Portfolio</Link></li>
-              <li><Link href="/packages" className={`${styles.linkItem} tw-type-xs-tight`}>Investment / Pricing</Link></li>
-              <li><Link href="/calculator" className={`${styles.linkItem} tw-type-xs-tight`}>Custom Package Builder</Link></li>
-              <li><Link href="/contact" className={`${styles.linkItem} tw-type-xs-tight`}>Contact &amp; Reviews</Link></li>
+              <li><Link href="/about/" className={`${styles.linkItem} tw-type-xs-tight`}>The Agency</Link></li>
+              <li><Link href="/portfolio/" className={`${styles.linkItem} tw-type-xs-tight`}>Portfolio</Link></li>
+              <li><Link href="/packages/" className={`${styles.linkItem} tw-type-xs-tight`}>Investment / Pricing</Link></li>
+              <li><Link href="/calculator/" className={`${styles.linkItem} tw-type-xs-tight`}>Custom Package Builder</Link></li>
+              <li><Link href="/contact/" className={`${styles.linkItem} tw-type-xs-tight`}>Contact &amp; Reviews</Link></li>
             </ul>
           </div>
 
@@ -48,11 +55,11 @@ export default function Footer() {
           <div>
             <h4 className={`${styles.colTitle} tw-type-sm`}>Our Capabilities</h4>
             <ul className={styles.linkList}>
-              <li><Link href="/services/web-development-kerala" className={`${styles.linkItem} tw-type-xs-tight`}>Web Engineering</Link></li>
-              <li><Link href="/services/graphic-design-kerala" className={`${styles.linkItem} tw-type-xs-tight`}>Cinematic Design</Link></li>
-              <li><Link href="/services/seo-company-kerala" className={`${styles.linkItem} tw-type-xs-tight`}>Brand Systems &amp; SEO</Link></li>
-              <li><Link href="/services/digital-marketing-kerala" className={`${styles.linkItem} tw-type-xs-tight`}>Motion &amp; Marketing</Link></li>
-              <li><Link href="/services" className={`${styles.linkItem} tw-type-xs-tight`}>All Capabilities ↗</Link></li>
+              <li><Link href="/services/web-development-kerala/" className={`${styles.linkItem} tw-type-xs-tight`}>Web Engineering</Link></li>
+              <li><Link href="/services/graphic-design-kerala/" className={`${styles.linkItem} tw-type-xs-tight`}>Cinematic Design</Link></li>
+              <li><Link href="/services/seo-company-kerala/" className={`${styles.linkItem} tw-type-xs-tight`}>Brand Systems &amp; SEO</Link></li>
+              <li><Link href="/services/digital-marketing-kerala/" className={`${styles.linkItem} tw-type-xs-tight`}>Motion &amp; Marketing</Link></li>
+              <li><Link href="/services/" className={`${styles.linkItem} tw-type-xs-tight`}>All Capabilities ↗</Link></li>
             </ul>
           </div>
 
@@ -60,8 +67,8 @@ export default function Footer() {
           <div>
             <h4 className={`${styles.colTitle} tw-type-sm`}>Legal &amp; Social</h4>
             <ul className={styles.linkList}>
-              <li><Link href="/agreement" className={`${styles.linkItem} tw-type-xs-tight`}>Client Agreement</Link></li>
-              <li><Link href="/terms" className={`${styles.linkItem} tw-type-xs-tight`}>Terms &amp; Conditions</Link></li>
+              <li><Link href="/agreement/" className={`${styles.linkItem} tw-type-xs-tight`}>Client Agreement</Link></li>
+              <li><Link href="/terms/" className={`${styles.linkItem} tw-type-xs-tight`}>Terms &amp; Conditions</Link></li>
               <li><a href="https://github.com" target="_blank" rel="noopener noreferrer" className={`${styles.linkItem} tw-type-xs-tight`}>GitHub</a></li>
               <li><a href="https://x.com" target="_blank" rel="noopener noreferrer" className={`${styles.linkItem} tw-type-xs-tight`}>X (Twitter)</a></li>
               <li><a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className={`${styles.linkItem} tw-type-xs-tight`}>LinkedIn</a></li>

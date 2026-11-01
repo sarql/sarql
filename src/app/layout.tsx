@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import EnquiryPopup from '@/components/ui/EnquiryPopup';
+import FloatingContactWidget from '@/components/ui/FloatingContactWidget';
 
 export const metadata: Metadata = {
   title: 'Sarql — Digital Excellence & Engineering',
@@ -63,6 +65,8 @@ export default function RootLayout({
         <Header />
         <main>{children}</main>
         <Footer />
+        <EnquiryPopup />
+        <FloatingContactWidget />
       </body>
     </html>
   );

@@ -20,10 +20,10 @@ export default function Cta() {
           </h2>
 
           <div className={styles.actions}>
-            <Link href="mailto:contact@sarql.com" className="btn-sales">
+            <Link href="mailto:team.sarql@gmail.com" className="btn-sales">
               Talk to us
             </Link>
-            <Link href="#contact" className="btn-signup">
+            <Link href="/contact/" className="btn-signup">
               Start a project
             </Link>
           </div>

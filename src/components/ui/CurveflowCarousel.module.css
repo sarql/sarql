@@ -1,8 +1,6 @@
 .carouselSection {
   position: relative;
-  width: 100vw;
-  margin-left: calc(-50vw + 50%);
-  margin-right: calc(-50vw + 50%);
+  width: 100%;
   background: var(--page-background-color, #FDFCFC);
   display: flex;
   flex-direction: column;
@@ -10,9 +8,10 @@
   padding-bottom: 2.5rem;
   user-select: none;
   -webkit-user-select: none;
+  overflow: hidden;
 }
 
-/* Dedicated Canvas Stage: ONLY the artwork canvas runs here */
+/* Dedicated Canvas Stage: Directly visible with zero delay */
 .canvasStage {
   position: relative;
   width: 100%;
@@ -55,10 +54,10 @@
   top: 0;
   bottom: 0;
   left: 0;
-  width: 80px;
-  background: linear-gradient(to right, var(--page-background-color, #FDFCFC) 0%, rgba(253, 252, 252, 0) 100%);
+  width: 5rem;
+  background: linear-gradient(to right, #FDFCFC 0%, rgba(253, 252, 252, 0) 100%);
   pointer-events: none;
-  z-index: 10;
+  z-index: 2;
 }
 
 .sideFadeRight {
@@ -66,38 +65,34 @@
   top: 0;
   bottom: 0;
   right: 0;
-  width: 80px;
-  background: linear-gradient(to left, var(--page-background-color, #FDFCFC) 0%, rgba(253, 252, 252, 0) 100%);
+  width: 5rem;
+  background: linear-gradient(to left, #FDFCFC 0%, rgba(253, 252, 252, 0) 100%);
   pointer-events: none;
-  z-index: 10;
+  z-index: 2;
 }
 
 @media (min-width: 48rem) {
-  .sideFadeLeft, .sideFadeRight {
-    width: 140px;
+  .sideFadeLeft,
+  .sideFadeRight {
+    width: 9rem;
   }
 }
 
-/* Controls Bar: Strictly BELOW the canvas stage in normal document flow */
+/* Minimalist Controls Bar - Pure and Silent */
 .bottomBar {
-  position: relative;
-  z-index: 20;
-  margin-top: 1.25rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.65rem;
-  padding: 0 1rem;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  z-index: 10;
 }
 
 .controlsGroup {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  gap: 0.75rem;
+  background: #FFFFFF;
   padding: 0.35rem 0.6rem;
   border-radius: 9999px;
   border: 1px solid rgba(0, 0, 0, 0.08);
@@ -135,7 +130,7 @@
   padding: 0.2rem 0.5rem;
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.4rem;
   white-space: nowrap;
 }
 
@@ -147,52 +142,6 @@
 .totalText {
   color: #777777;
   font-weight: 400;
-}
-
-.batchRow {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.nextBatchBtn {
-  background: #000000;
-  color: #FFFFFF;
-  border: none;
-  padding: 0.38rem 0.9rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  white-space: nowrap;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.nextBatchBtn:hover {
-  opacity: 0.88;
-  transform: scale(1.03);
-}
-
-.prevBatchBtn {
-  background: #FFFFFF;
-  color: #444444;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  padding: 0.35rem 0.8rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  white-space: nowrap;
-}
-
-.prevBatchBtn:hover {
-  background: #F4F2F0;
-  color: #000000;
 }
 
 .hintText {

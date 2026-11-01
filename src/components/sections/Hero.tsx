@@ -37,16 +37,17 @@ export default function Hero() {
           <div className={styles.heroGrid}>
             <div className={styles.heroColLeft}>
               <h1 className={`${styles.h1} tw-type-6xl`}>
-                We build digital 
-                <span className={styles.h1Break}>experiences that dominate</span>
+                We build{' '}
+                <span className={styles.h1Break}>digital experiences</span>{' '}
+                <span className={styles.h1Break}>that dominate</span>
               </h1>
 
               <div className={styles.actionsWrap}>
                 <div className={styles.buttonRow}>
-                  <Link href="#contact" className="btn-signup">
+                  <Link href="/contact/" className="btn-signup">
                     Start a project
                   </Link>
-                  <Link href="#projects" className="btn-sales">
+                  <Link href="/portfolio/" className="btn-sales">
                     View work
                   </Link>
                 </div>

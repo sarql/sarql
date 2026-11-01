@@ -191,7 +191,7 @@ export default function PackagesPage() {
                   <div className={styles.deliveryTag}>Delivery Time: {pkg.delivery}</div>
                   <div style={{ marginTop: '1.25rem' }}>
                     <Link
-                      href={`/contact?pkg=${encodeURIComponent(pkg.name + ' Website')}`}
+                      href={`/contact/?pkg=${encodeURIComponent(pkg.name + ' Website')}`}
                       className={pkg.featured ? 'btn-signup' : 'btn-sales'}
                       style={{ width: '100%', textAlign: 'center' }}
                     >
@@ -234,7 +234,7 @@ export default function PackagesPage() {
 
                 <div>
                   <Link
-                    href={`/contact?pkg=${encodeURIComponent(b.name)}`}
+                    href={`/contact/?pkg=${encodeURIComponent(b.name)}`}
                     className={b.featured ? 'btn-signup' : 'btn-sales'}
                     style={{ width: '100%', textAlign: 'center' }}
                   >
@@ -349,7 +349,7 @@ export default function PackagesPage() {
             </p>
           </div>
           <div>
-            <Link href="/calculator" className="btn-signup" style={{ backgroundColor: '#fff', color: '#000', whiteSpace: 'nowrap' }}>
+            <Link href="/calculator/" className="btn-signup" style={{ backgroundColor: '#fff', color: '#000', whiteSpace: 'nowrap' }}>
               Launch Custom Builder ↗
             </Link>
           </div>

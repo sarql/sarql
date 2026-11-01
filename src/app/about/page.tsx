@@ -43,10 +43,10 @@ export default function AboutPage() {
             Sarql is a leading web development company in Kerala offering website design, UI/UX, ecommerce and branding services.
           </p>
           <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-            <Link href="/contact" className="btn-signup">
+            <Link href="/contact/" className="btn-signup">
               Start Project
             </Link>
-            <Link href="/portfolio" className="btn-sales">
+            <Link href="/portfolio/" className="btn-sales">
               View Our Work
             </Link>
           </div>
@@ -83,10 +83,10 @@ export default function AboutPage() {
         <div className={styles.ctaBox}>
           <h2 className={styles.ctaTitle}>Ready to evolve your digital presence?</h2>
           <div className={styles.ctaActions}>
-            <Link href="/contact" className="btn-signup" style={{ backgroundColor: '#fff', color: '#000' }}>
+            <Link href="/contact/" className="btn-signup" style={{ backgroundColor: '#fff', color: '#000' }}>
               Start Project
             </Link>
-            <Link href="/calculator" className="btn-sales" style={{ borderColor: 'rgba(255,255,255,0.3)', color: '#fff' }}>
+            <Link href="/calculator/" className="btn-sales" style={{ borderColor: 'rgba(255,255,255,0.3)', color: '#fff' }}>
               Estimate Your Package
             </Link>
           </div>

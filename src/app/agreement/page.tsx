@@ -108,10 +108,10 @@ export default function AgreementPage() {
             We work with clarity and velocity. Contact our team to draft your project scope architecture.
           </p>
           <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href="/contact" className="btn-signup" style={{ backgroundColor: '#fff', color: '#000' }}>
+            <Link href="/contact/" className="btn-signup" style={{ backgroundColor: '#fff', color: '#000' }}>
               Start a Project
             </Link>
-            <Link href="/packages" className="btn-sales" style={{ borderColor: 'rgba(255,255,255,0.3)', color: '#fff' }}>
+            <Link href="/packages/" className="btn-sales" style={{ borderColor: 'rgba(255,255,255,0.3)', color: '#fff' }}>
               Review Packages
             </Link>
           </div>

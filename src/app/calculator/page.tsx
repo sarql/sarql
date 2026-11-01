@@ -1,8 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { ChevronUp, X, CheckCircle2, Pencil, RotateCcw } from 'lucide-react';
+import WhatsAppIcon from '@/components/ui/WhatsAppIcon';
 import styles from './Calculator.module.css';
+import { submitInquiry } from '@/services/crmService';
+
+interface ClientInfo {
+  fullName: string;
+  phone: string;
+  email: string;
+  company: string;
+}
+
+const DRAFT_STORAGE_KEY = 'sarql_calculator_draft';
 
 interface WebOption {
   id: string;
@@ -44,10 +56,120 @@ const MARKETING = [
 ];
 
 export default function CalculatorPage() {
+  // Client Info State
+  const [clientInfo, setClientInfo] = useState<ClientInfo>({
+    fullName: '',
+    phone: '',
+    email: '',
+    company: '',
+  });
+  const [isClientModalOpen, setIsClientModalOpen] = useState(false);
+  const [hasClientSaved, setHasClientSaved] = useState(false);
+  const [draftNotice, setDraftNotice] = useState<string | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Package Selections State
   const [selectedWeb, setSelectedWeb] = useState<string | null>(null);
   const [graphicCounts, setGraphicCounts] = useState<Record<string, number>>({});
   const [videoCounts, setVideoCounts] = useState<Record<string, number>>({});
   const [selectedMarketing, setSelectedMarketing] = useState<string | null>(null);
+  const [isMobileSheetOpen, setIsMobileSheetOpen] = useState(false);
+
+  // 1. Restore Draft from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(DRAFT_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.clientInfo && (parsed.clientInfo.fullName || parsed.clientInfo.phone)) {
+          setClientInfo(parsed.clientInfo);
+          setHasClientSaved(true);
+        } else {
+          setIsClientModalOpen(true);
+        }
+
+        if (parsed.selectedWeb) setSelectedWeb(parsed.selectedWeb);
+        if (parsed.graphicCounts) setGraphicCounts(parsed.graphicCounts);
+        if (parsed.videoCounts) setVideoCounts(parsed.videoCounts);
+        if (parsed.selectedMarketing) setSelectedMarketing(parsed.selectedMarketing);
+
+        const hasSelections =
+          Boolean(parsed.selectedWeb) ||
+          Object.values(parsed.graphicCounts || {}).some((v: any) => v > 0) ||
+          Object.values(parsed.videoCounts || {}).some((v: any) => v > 0) ||
+          Boolean(parsed.selectedMarketing);
+
+        if (hasSelections) {
+          setDraftNotice('Draft restored from your previous session.');
+          setTimeout(() => setDraftNotice(null), 5000);
+        }
+      } else {
+        // First-time visitor: open the client details capture component
+        setIsClientModalOpen(true);
+      }
+    } catch (e) {
+      console.error('Failed to load calculator draft:', e);
+      setIsClientModalOpen(true);
+    } finally {
+      setIsInitialized(true);
+    }
+  }, []);
+
+  // 2. Auto-save Draft to localStorage whenever selections or clientInfo change
+  useEffect(() => {
+    if (!isInitialized) return;
+    try {
+      const payload = {
+        clientInfo,
+        hasClientSaved,
+        selectedWeb,
+        graphicCounts,
+        videoCounts,
+        selectedMarketing,
+        updatedAt: Date.now(),
+      };
+      localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(payload));
+    } catch (e) {
+      console.error('Failed to save draft:', e);
+    }
+  }, [clientInfo, hasClientSaved, selectedWeb, graphicCounts, videoCounts, selectedMarketing, isInitialized]);
+
+  const handleClearDraft = () => {
+    if (typeof window !== 'undefined' && window.confirm('Are you sure you want to reset your configuration?')) {
+      setSelectedWeb(null);
+      setGraphicCounts({});
+      setVideoCounts({});
+      setSelectedMarketing(null);
+      try {
+        localStorage.removeItem(DRAFT_STORAGE_KEY);
+      } catch {}
+      setDraftNotice('Draft cleared. You can start fresh.');
+      setTimeout(() => setDraftNotice(null), 3000);
+    }
+  };
+
+  const handleClientSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!clientInfo.fullName.trim() || !clientInfo.phone.trim()) return;
+
+    setHasClientSaved(true);
+    setIsClientModalOpen(false);
+
+    // Save lead capture immediately into CRM & Google Sheet so abandoned sessions are never lost!
+    try {
+      submitInquiry({
+        fullName: clientInfo.fullName.trim(),
+        phone: clientInfo.phone.trim(),
+        email: clientInfo.email.trim() || 'N/A',
+        company: clientInfo.company.trim() || 'N/A',
+        scope: 'Custom Package Builder (Started Architecture)',
+        budget: 'Draft in progress',
+        source: 'Package Builder (Lead Capture)',
+      });
+    } catch (err) {
+      console.error('Error submitting initial builder lead:', err);
+    }
+  };
 
   const updateCount = (type: 'graphic' | 'video', id: string, delta: number) => {
     if (type === 'graphic') {
@@ -91,36 +213,88 @@ export default function CalculatorPage() {
   const discount = isBundle ? Math.round(subtotal * 0.1) : 0;
   const estimatedTotal = subtotal - discount;
 
-  // WhatsApp Inquiry Generator
+  const selectedCount =
+    (webItem ? 1 : 0) +
+    Object.values(graphicCounts).reduce((a, b) => a + b, 0) +
+    Object.values(videoCounts).reduce((a, b) => a + b, 0) +
+    (mktItem ? 1 : 0);
+
+  
+  const handleCalculatorSubmit = async () => {
+    try {
+      const summaryScope: string[] = [];
+      if (webItem) summaryScope.push(`Website: ${webItem.name} (₹${webItem.price.toLocaleString('en-IN')})`);
+      Object.entries(graphicCounts).forEach(([id, count]) => {
+        if (count > 0) {
+          const item = GRAPHICS.find((g) => g.id === id);
+          if (item) summaryScope.push(`Graphics: ${item.name} x${count} (₹${(item.price * count).toLocaleString('en-IN')})`);
+        }
+      });
+      Object.entries(videoCounts).forEach(([id, count]) => {
+        if (count > 0) {
+          const item = VIDEOS.find((v) => v.id === id);
+          if (item) summaryScope.push(`Video: ${item.name} x${count} (₹${(item.price * count).toLocaleString('en-IN')})`);
+        }
+      });
+      if (mktItem) summaryScope.push(`Marketing: ${mktItem.name} (₹${mktItem.price.toLocaleString('en-IN')}/mo)`);
+      if (discount > 0) summaryScope.push(`Bundle Discount (10%): -₹${discount.toLocaleString('en-IN')}`);
+      summaryScope.push(`Total: ₹${estimatedTotal.toLocaleString('en-IN')}`);
+
+      await submitInquiry({
+        fullName: clientInfo.fullName.trim() || 'Client Partner',
+        phone: clientInfo.phone.trim() || 'WhatsApp Lead',
+        email: clientInfo.email.trim() || 'N/A',
+        company: clientInfo.company.trim() || 'N/A',
+        scope: summaryScope.join(' | ') || 'Custom Package Estimate',
+        budget: `₹${estimatedTotal.toLocaleString('en-IN')}`,
+        source: 'Custom Package Builder (Finalized)',
+      });
+    } catch (e) {
+      console.error('Failed to submit final calculator inquiry:', e);
+    }
+  };
+
+  // WhatsApp Inquiry Generator with complete Client Details & Itemized Scope
   const generateWhatsAppMessage = () => {
-    let msg = 'Sarql Custom Package Inquiry\n\n';
-    if (webItem) msg += `- Website: ${webItem.name} (₹${webItem.price.toLocaleString('en-IN')})\n`;
+    let msg = '*Sarql Custom Package Architecture Inquiry*\n\n';
+
+    if (clientInfo.fullName) {
+      msg += `*Client Details:*\n`;
+      msg += `• Name: ${clientInfo.fullName}\n`;
+      if (clientInfo.phone) msg += `• Phone: ${clientInfo.phone}\n`;
+      if (clientInfo.company) msg += `• Business/Brand: ${clientInfo.company}\n`;
+      if (clientInfo.email) msg += `• Email: ${clientInfo.email}\n`;
+      msg += `\n`;
+    }
+
+    msg += `*Selected Package Scope:*\n`;
+    if (webItem) msg += `• Website: ${webItem.name} (₹${webItem.price.toLocaleString('en-IN')})\n`;
 
     Object.entries(graphicCounts).forEach(([id, count]) => {
       if (count > 0) {
         const item = GRAPHICS.find((g) => g.id === id);
-        if (item) msg += `- Graphics: ${item.name} x${count} (₹${(item.price * count).toLocaleString('en-IN')})\n`;
+        if (item) msg += `• Graphics: ${item.name} x${count} (₹${(item.price * count).toLocaleString('en-IN')})\n`;
       }
     });
 
     Object.entries(videoCounts).forEach(([id, count]) => {
       if (count > 0) {
         const item = VIDEOS.find((v) => v.id === id);
-        if (item) msg += `- Video: ${item.name} x${count} (₹${(item.price * count).toLocaleString('en-IN')})\n`;
+        if (item) msg += `• Video: ${item.name} x${count} (₹${(item.price * count).toLocaleString('en-IN')})\n`;
       }
     });
 
-    if (mktItem) msg += `- Marketing: ${mktItem.name} (₹${mktItem.price.toLocaleString('en-IN')}/mo)\n`;
+    if (mktItem) msg += `• Marketing: ${mktItem.name} (₹${mktItem.price.toLocaleString('en-IN')}/mo)\n`;
 
     msg += `\nSubtotal: ₹${subtotal.toLocaleString('en-IN')}\n`;
-    if (discount > 0) msg += `Bundle Discount: -₹${discount.toLocaleString('en-IN')}\n`;
-    msg += `Estimated Total: ₹${estimatedTotal.toLocaleString('en-IN')}\n\nI would like to discuss and initiate this project.`;
+    if (discount > 0) msg += `Bundle Discount (10%): -₹${discount.toLocaleString('en-IN')}\n`;
+    msg += `*Estimated Total: ₹${estimatedTotal.toLocaleString('en-IN')}*\n\nI would like to initiate and discuss this project with Sarql engineering.`;
 
     return `https://wa.me/917558811574?text=${encodeURIComponent(msg)}`;
   };
 
   return (
-    <div className={styles.pageWrapper}>
+    <div className={`${styles.pageWrapper} ${subtotal > 0 ? styles.pageWrapperWithFloatingBar : ''}`}>
       <div className="tw-container">
         {/* Hero */}
         <div className={styles.hero}>
@@ -129,11 +303,50 @@ export default function CalculatorPage() {
           <p className={styles.lead}>
             Configure your own service package with real-time pricing and multi-category bundle discounts.
           </p>
+
+          {/* Client Profile / Active Draft Banner */}
+          {hasClientSaved && (
+            <div className={styles.clientProfileBar}>
+              <div className={styles.clientProfileInfo}>
+                <span className={styles.clientProfileDot} />
+                <span className={styles.clientProfileText}>
+                  Architecture tailored for: <strong>{clientInfo.fullName}</strong>
+                  {clientInfo.company ? ` (${clientInfo.company})` : ''} • <span style={{ color: '#10B981' }}>{clientInfo.phone}</span>
+                </span>
+              </div>
+              <div className={styles.clientProfileActions}>
+                <button
+                  type="button"
+                  onClick={() => setIsClientModalOpen(true)}
+                  className={styles.clientEditBtn}
+                >
+                  <Pencil size={13} strokeWidth={2.2} />
+                  <span>Edit Info</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleClearDraft}
+                  className={styles.clientResetBtn}
+                  title="Clear configuration and start over"
+                >
+                  <RotateCcw size={13} strokeWidth={2.2} />
+                  <span>Reset Draft</span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {draftNotice && (
+            <div className={styles.draftNoticeBanner}>
+              <CheckCircle2 size={16} color="#10B981" />
+              <span>{draftNotice}</span>
+            </div>
+          )}
         </div>
 
         <div className={styles.calcLayout}>
           {/* Controls Column */}
-          <div>
+          <div className={styles.controlsCol}>
             {/* 1. Websites */}
             <div className={styles.sectionBlock}>
               <div className={styles.sectionHeading}>
@@ -162,8 +375,23 @@ export default function CalculatorPage() {
                         {w.desc}
                       </div>
                     </div>
-                    <div style={{ fontWeight: 600, marginTop: '0.75rem', fontSize: '1rem', color: '#000' }}>
-                      ₹{w.price.toLocaleString('en-IN')}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.75rem' }}>
+                      <div style={{ fontWeight: 600, fontSize: '1rem', color: '#000' }}>
+                        ₹{w.price.toLocaleString('en-IN')}
+                      </div>
+                      {selectedWeb === w.id && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedWeb(null);
+                          }}
+                          className={styles.cardRemoveBadge}
+                          title="Remove this option"
+                        >
+                          ✕ Remove
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -276,8 +504,23 @@ export default function CalculatorPage() {
                         {m.desc}
                       </div>
                     </div>
-                    <div style={{ fontWeight: 600, marginTop: '0.75rem', fontSize: '1rem', color: '#000' }}>
-                      ₹{m.price.toLocaleString('en-IN')}/mo
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.75rem' }}>
+                      <div style={{ fontWeight: 600, fontSize: '1rem', color: '#000' }}>
+                        ₹{m.price.toLocaleString('en-IN')}/mo
+                      </div>
+                      {selectedMarketing === m.id && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedMarketing(null);
+                          }}
+                          className={styles.cardRemoveBadge}
+                          title="Remove this option"
+                        >
+                          ✕ Remove
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -285,8 +528,8 @@ export default function CalculatorPage() {
             </div>
           </div>
 
-          {/* Floating Sticky Summary Column */}
-          <div>
+          {/* Floating Sticky Summary Column (Desktop View) */}
+          <div className={styles.summaryCol}>
             <div className={styles.summaryCard}>
               <h2 className={styles.summaryTitle}>Estimated Scope</h2>
 
@@ -298,7 +541,18 @@ export default function CalculatorPage() {
                 <div className={styles.summaryList}>
                   {webItem && (
                     <div className={styles.summaryRow}>
-                      <span>{webItem.name}</span>
+                      <div className={styles.summaryItemTitle}>
+                        <span>{webItem.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedWeb(null)}
+                          className={styles.summaryItemRemoveBtn}
+                          title="Remove from package"
+                          aria-label={`Remove ${webItem.name}`}
+                        >
+                          ✕
+                        </button>
+                      </div>
                       <span>₹{webItem.price.toLocaleString('en-IN')}</span>
                     </div>
                   )}
@@ -309,7 +563,18 @@ export default function CalculatorPage() {
                     if (!item) return null;
                     return (
                       <div key={id} className={styles.summaryRow}>
-                        <span>{item.name} × {count}</span>
+                        <div className={styles.summaryItemTitle}>
+                          <span>{item.name} × {count}</span>
+                          <button
+                            type="button"
+                            onClick={() => setGraphicCounts((prev) => ({ ...prev, [id]: 0 }))}
+                            className={styles.summaryItemRemoveBtn}
+                            title="Remove from package"
+                            aria-label={`Remove ${item.name}`}
+                          >
+                            ✕
+                          </button>
+                        </div>
                         <span>₹{(item.price * count).toLocaleString('en-IN')}</span>
                       </div>
                     );
@@ -321,7 +586,18 @@ export default function CalculatorPage() {
                     if (!item) return null;
                     return (
                       <div key={id} className={styles.summaryRow}>
-                        <span>{item.name} × {count}</span>
+                        <div className={styles.summaryItemTitle}>
+                          <span>{item.name} × {count}</span>
+                          <button
+                            type="button"
+                            onClick={() => setVideoCounts((prev) => ({ ...prev, [id]: 0 }))}
+                            className={styles.summaryItemRemoveBtn}
+                            title="Remove from package"
+                            aria-label={`Remove ${item.name}`}
+                          >
+                            ✕
+                          </button>
+                        </div>
                         <span>₹{(item.price * count).toLocaleString('en-IN')}</span>
                       </div>
                     );
@@ -329,7 +605,18 @@ export default function CalculatorPage() {
 
                   {mktItem && (
                     <div className={styles.summaryRow}>
-                      <span>{mktItem.name}</span>
+                      <div className={styles.summaryItemTitle}>
+                        <span>{mktItem.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedMarketing(null)}
+                          className={styles.summaryItemRemoveBtn}
+                          title="Remove from package"
+                          aria-label={`Remove ${mktItem.name}`}
+                        >
+                          ✕
+                        </button>
+                      </div>
                       <span>₹{mktItem.price.toLocaleString('en-IN')}/mo</span>
                     </div>
                   )}
@@ -358,19 +645,26 @@ export default function CalculatorPage() {
               <div>
                 <a
                   href={generateWhatsAppMessage()}
+                  onClick={handleCalculatorSubmit}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-signup"
                   style={{
-                    backgroundColor: '#FFFFFF',
-                    color: '#000000',
+                    backgroundColor: '#25D366',
+                    color: '#FFFFFF',
                     width: '100%',
                     textAlign: 'center',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.5rem',
                     pointerEvents: subtotal === 0 ? 'none' : 'auto',
                     opacity: subtotal === 0 ? 0.4 : 1,
+                    fontWeight: 600,
                   }}
                 >
-                  Send Inquiry on WhatsApp ↗
+                  <WhatsAppIcon size={20} color="#FFFFFF" />
+                  <span>Send Inquiry on WhatsApp</span>
                 </a>
                 <div style={{ textAlign: 'center', marginTop: '0.75rem', fontSize: '0.6875rem', color: 'rgba(255,255,255,0.45)' }}>
                   Instant response from Sarql engineering team
@@ -380,6 +674,316 @@ export default function CalculatorPage() {
           </div>
         </div>
       </div>
+
+      {/* Mobile Sticky Minimized Floating Summary Bar */}
+      {subtotal > 0 && (
+        <>
+          <div
+            className={styles.mobileFloatingBar}
+            onClick={() => setIsMobileSheetOpen(true)}
+            role="button"
+            tabIndex={0}
+            aria-label="View estimated scope"
+          >
+            <div className={styles.mobileBarLeft}>
+              <div className={styles.mobileBarTag}>
+                <span>{selectedCount} {selectedCount === 1 ? 'item' : 'items'} selected</span>
+                {discount > 0 && <span className={styles.mobileDiscountBadge}>10% BUNDLE OFF</span>}
+              </div>
+              <div className={styles.mobileBarPrice}>
+                ₹{estimatedTotal.toLocaleString('en-IN')}
+              </div>
+            </div>
+
+            <div className={styles.mobileBarRight}>
+              <button
+                type="button"
+                className={styles.mobileExpandBtn}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsMobileSheetOpen(true);
+                }}
+              >
+                <span>View Scope</span>
+                <ChevronUp size={16} strokeWidth={2.5} />
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile Detailed Bottom Sheet Drawer */}
+          {isMobileSheetOpen && (
+            <div
+              className={styles.mobileSheetOverlay}
+              onClick={() => setIsMobileSheetOpen(false)}
+            >
+              <div
+                className={styles.mobileSheetContent}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className={styles.sheetHandle} />
+
+                <div className={styles.sheetHeader}>
+                  <div>
+                    <h3 className={styles.sheetTitle}>Estimated Scope</h3>
+                    <p className={styles.sheetSubtitle}>
+                      {selectedCount} {selectedCount === 1 ? 'item' : 'items'} configured in custom package
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    className={styles.sheetCloseBtn}
+                    onClick={() => setIsMobileSheetOpen(false)}
+                    aria-label="Close details"
+                  >
+                    <X size={20} strokeWidth={2.2} />
+                  </button>
+                </div>
+
+                <div className={styles.sheetBody}>
+                  <div className={styles.summaryList} style={{ maxHeight: '18rem' }}>
+                    {webItem && (
+                      <div className={styles.summaryRow}>
+                        <div className={styles.summaryItemTitle}>
+                          <span style={{ fontWeight: 500 }}>{webItem.name}</span>
+                          <button
+                            type="button"
+                            onClick={() => setSelectedWeb(null)}
+                            className={styles.summaryItemRemoveBtn}
+                            title="Remove from package"
+                            aria-label={`Remove ${webItem.name}`}
+                          >
+                            ✕
+                          </button>
+                        </div>
+                        <span>₹{webItem.price.toLocaleString('en-IN')}</span>
+                      </div>
+                    )}
+
+                    {Object.entries(graphicCounts).map(([id, count]) => {
+                      if (count === 0) return null;
+                      const item = GRAPHICS.find((g) => g.id === id);
+                      if (!item) return null;
+                      return (
+                        <div key={id} className={styles.summaryRow}>
+                          <div className={styles.summaryItemTitle}>
+                            <span>{item.name} × {count}</span>
+                            <button
+                              type="button"
+                              onClick={() => setGraphicCounts((prev) => ({ ...prev, [id]: 0 }))}
+                              className={styles.summaryItemRemoveBtn}
+                              title="Remove from package"
+                              aria-label={`Remove ${item.name}`}
+                            >
+                              ✕
+                            </button>
+                          </div>
+                          <span>₹{(item.price * count).toLocaleString('en-IN')}</span>
+                        </div>
+                      );
+                    })}
+
+                    {Object.entries(videoCounts).map(([id, count]) => {
+                      if (count === 0) return null;
+                      const item = VIDEOS.find((v) => v.id === id);
+                      if (!item) return null;
+                      return (
+                        <div key={id} className={styles.summaryRow}>
+                          <div className={styles.summaryItemTitle}>
+                            <span>{item.name} × {count}</span>
+                            <button
+                              type="button"
+                              onClick={() => setVideoCounts((prev) => ({ ...prev, [id]: 0 }))}
+                              className={styles.summaryItemRemoveBtn}
+                              title="Remove from package"
+                              aria-label={`Remove ${item.name}`}
+                            >
+                              ✕
+                            </button>
+                          </div>
+                          <span>₹{(item.price * count).toLocaleString('en-IN')}</span>
+                        </div>
+                      );
+                    })}
+
+                    {mktItem && (
+                      <div className={styles.summaryRow}>
+                        <div className={styles.summaryItemTitle}>
+                          <span style={{ fontWeight: 500 }}>{mktItem.name}</span>
+                          <button
+                            type="button"
+                            onClick={() => setSelectedMarketing(null)}
+                            className={styles.summaryItemRemoveBtn}
+                            title="Remove from package"
+                            aria-label={`Remove ${mktItem.name}`}
+                          >
+                            ✕
+                          </button>
+                        </div>
+                        <span>₹{mktItem.price.toLocaleString('en-IN')}/mo</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className={styles.calcTotalBlock}>
+                    <div className={styles.summaryRow}>
+                      <span>Subtotal</span>
+                      <span>₹{subtotal.toLocaleString('en-IN')}</span>
+                    </div>
+
+                    {discount > 0 && (
+                      <div className={styles.summaryRow} style={{ color: '#10B981', fontWeight: 500 }}>
+                        <span>Bundle Discount (10%)</span>
+                        <span>-₹{discount.toLocaleString('en-IN')}</span>
+                      </div>
+                    )}
+
+                    <div className={styles.summaryRow} style={{ marginTop: '0.5rem' }}>
+                      <span style={{ fontSize: '1.05rem', fontWeight: 600 }}>Estimated Total</span>
+                      <span className={styles.grandTotal}>₹{estimatedTotal.toLocaleString('en-IN')}</span>
+                    </div>
+                  </div>
+
+                  <div style={{ marginTop: '0.75rem' }}>
+                    <a
+                      href={generateWhatsAppMessage()}
+                      onClick={() => {
+                        handleCalculatorSubmit();
+                        setIsMobileSheetOpen(false);
+                      }}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-signup"
+                      style={{
+                        backgroundColor: '#25D366',
+                        color: '#FFFFFF',
+                        width: '100%',
+                        textAlign: 'center',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '0.5rem',
+                        padding: '0.875rem 1.25rem',
+                        fontWeight: 600,
+                        borderRadius: '0.75rem',
+                      }}
+                    >
+                      <WhatsAppIcon size={20} color="#FFFFFF" />
+                      <span>Send Inquiry on WhatsApp</span>
+                    </a>
+
+                    <button
+                      type="button"
+                      onClick={() => setIsMobileSheetOpen(false)}
+                      className={styles.sheetCollapseBtn}
+                    >
+                      Keep Editing / Add More Items
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* INITIAL CLIENT DATA CAPTURE MODAL */}
+      {isClientModalOpen && (
+        <div className={styles.clientModalOverlay}>
+          <div className={styles.clientModalCard} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.clientModalHeader}>
+              <div>
+                <h3 className={styles.clientModalTitle}>Let&apos;s Build Your Package</h3>
+                <p className={styles.clientModalSubtitle}>
+                  Please share your basic details so we can tailor the system architecture and preserve your draft automatically.
+                </p>
+              </div>
+              {hasClientSaved && (
+                <button
+                  type="button"
+                  onClick={() => setIsClientModalOpen(false)}
+                  className={styles.clientModalCloseBtn}
+                  aria-label="Close"
+                >
+                  <X size={18} strokeWidth={2.2} />
+                </button>
+              )}
+            </div>
+
+            <form onSubmit={handleClientSubmit} className={styles.clientModalForm}>
+              <div className={styles.formRow}>
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>Your Full Name *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Muhammed Ansar"
+                    value={clientInfo.fullName}
+                    onChange={(e) => setClientInfo({ ...clientInfo, fullName: e.target.value })}
+                    className={styles.formInput}
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>WhatsApp / Phone *</label>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="+91 98765 43210"
+                    value={clientInfo.phone}
+                    onChange={(e) => setClientInfo({ ...clientInfo, phone: e.target.value })}
+                    className={styles.formInput}
+                  />
+                </div>
+              </div>
+
+              <div className={styles.formRow}>
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>Email Address</label>
+                  <input
+                    type="email"
+                    placeholder="name@company.com"
+                    value={clientInfo.email}
+                    onChange={(e) => setClientInfo({ ...clientInfo, email: e.target.value })}
+                    className={styles.formInput}
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>Company / Brand Name</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Acme Innovations"
+                    value={clientInfo.company}
+                    onChange={(e) => setClientInfo({ ...clientInfo, company: e.target.value })}
+                    className={styles.formInput}
+                  />
+                </div>
+              </div>
+
+              <div style={{ marginTop: '0.625rem' }}>
+                <button
+                  type="submit"
+                  className="btn-signup"
+                  style={{
+                    width: '100%',
+                    textAlign: 'center',
+                    padding: '0.875rem 1.25rem',
+                    fontSize: '0.9375rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Start Customizing Architecture →
+                </button>
+              </div>
+
+              <p className={styles.clientPrivacyNotice}>
+                ✓ Your selections and progress will be securely saved as a draft. You can return anytime.
+              </p>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

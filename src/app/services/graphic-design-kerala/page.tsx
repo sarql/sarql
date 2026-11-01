@@ -37,10 +37,10 @@ export default function Page() {
         </div>
 
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-          <Link href="/contact" className="btn-signup">
-            Schedule Discovery Consultation
+          <Link href="/contact/" className="btn-signup">
+            Start Your Project
           </Link>
-          <Link href="/packages" className="btn-sales">
+          <Link href="/packages/" className="btn-sales">
             View Packages & Pricing
           </Link>
         </div>
