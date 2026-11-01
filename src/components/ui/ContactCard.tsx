@@ -10,7 +10,7 @@ import {
   sendBeaconLead,
   getSessionLeadId,
 } from '@/services/crmService';
-import { Sparkles, MessageSquareQuote, CheckCircle2, Star, X } from 'lucide-react';
+import { Rocket, Package, MessageSquareQuote, CheckCircle2, Star, X } from 'lucide-react';
 
 interface ContactCardProps {
   onSuccess?: () => void;
@@ -204,7 +204,7 @@ export default function ContactCard({ onSuccess, isPopup = false }: ContactCardP
             className={`${styles.tabBtn} ${activeTab === 'project' ? styles.tabBtnActive : ''}`}
             onClick={() => { setActiveTab('project'); setSubmittedMessage(null); }}
           >
-            <Sparkles size={16} strokeWidth={2} />
+            <Rocket size={16} strokeWidth={2} />
             <span>Start a Project</span>
           </button>
           <button
@@ -281,7 +281,7 @@ export default function ContactCard({ onSuccess, isPopup = false }: ContactCardP
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-                <Sparkles size={16} color="#34D399" />
+                <Package size={16} color="#34D399" />
                 <span style={{ fontSize: '0.875rem' }}>
                   Selected Package: <strong style={{ color: '#FFFFFF', fontWeight: 600 }}>{selectedPlan}</strong>
                 </span>
